@@ -22,7 +22,8 @@ split
 	(current.uiState == 0 // State: inside a level
 	&& current.notCutscene == 0
 	&& old.notCutscene == 1
-	&& current.world != 6) // Don't split after Dr. Fetus phase 1
+	&& current.world != 6 // Don't split after Dr. Fetus phase 1
+	&& current.world != 0) // Don't split on game exit
 	||
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
 	&& old.fetus != 0x80000000);
