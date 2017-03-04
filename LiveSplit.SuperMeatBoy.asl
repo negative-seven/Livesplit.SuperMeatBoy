@@ -22,3 +22,8 @@ split
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
 	&& old.fetus != 0x80000000);
 }
+
+reset
+{
+	return current.uiState == 11; // On title screen
+}
