@@ -8,7 +8,7 @@ state("SuperMeatBoy")
 
 start
 {
-	return current.uiState == 13;
+	return current.uiState == 13; // Pressed "Start Game"
 }
 
 split
@@ -16,7 +16,7 @@ split
 	return
 	(current.notCutscene == 0
 	&& old.notCutscene == 1
-	&& current.uiState == 0 
+	&& current.uiState == 0 // Inside a level
 	&& current.world != 6) // Don't split after Dr. Fetus phase 1
 	||
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
