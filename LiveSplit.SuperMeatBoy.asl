@@ -6,17 +6,22 @@ state("SuperMeatBoy")
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 }
 
+startup
+{
+	settings.Add("menuReset", false, "Reset timer on main menu");
+}
+
 start
 {
-	return current.uiState == 13; // Pressed "Start Game"
+	return current.uiState == 13; // State: pressed "Start Game"
 }
 
 split
 {
 	return
-	(current.notCutscene == 0
+	(current.uiState == 0 // State: inside a level
+	&& current.notCutscene == 0
 	&& old.notCutscene == 1
-	&& current.uiState == 0 // Inside a level
 	&& current.world != 6) // Don't split after Dr. Fetus phase 1
 	||
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
@@ -25,5 +30,8 @@ split
 
 reset
 {
-	return current.uiState == 11; // On title screen
+	return current.uiState == 11 // State: on title screen
+	||
+	(settings["menuReset"] // Reset on main menu enabled
+	&& current.uiState == 15); // State: main menu
 }
