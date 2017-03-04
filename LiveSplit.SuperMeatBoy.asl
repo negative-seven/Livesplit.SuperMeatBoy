@@ -6,11 +6,6 @@ state("SuperMeatBoy")
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 }
 
-init
-{
-	return true;
-}
-
 start
 {
 	return current.uiState == 13;
