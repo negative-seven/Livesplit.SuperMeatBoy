@@ -4,6 +4,7 @@ state("SuperMeatBoy")
 	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
 	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
+	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
 }
 
 startup
@@ -30,7 +31,10 @@ split
 
 reset
 {
-	return current.uiState == 11 // State: on title screen
+	return
+	current.exit == 1 // Exiting game (only works if exiting through "Exit Game")
+	||
+	current.uiState == 11 // State: on title screen
 	||
 	(settings["menuReset"] // Reset on main menu enabled
 	&& current.uiState == 15); // State: main menu
