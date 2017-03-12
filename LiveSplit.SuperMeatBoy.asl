@@ -5,6 +5,7 @@ state("SuperMeatBoy")
 	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
 	byte level : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
+	byte loadingSaw : "SuperMeatBoy.exe", 0x2D6FB0;
 	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
 }
 
@@ -16,6 +17,11 @@ startup
 start
 {
 	return current.uiState == 13; // State: pressed "Start Game"
+}
+
+isLoading
+{
+	return current.loadingSaw == 1;
 }
 
 split
