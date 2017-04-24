@@ -6,11 +6,13 @@ state("SuperMeatBoy")
 	byte level : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
+	byte notLevelBeaten : "SuperMeatBoy.exe", 0x1B6638;
 }
 
 startup
 {
 	settings.Add("menuReset", false, "Reset timer on main menu");
+	settings.Add("individualLevels", false, "Split on each level");
 }
 
 start
@@ -28,7 +30,11 @@ split
 	&& current.level == 99) // Inside a boss fight
 	||
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
-	&& old.fetus != 0x80000000);
+	&& old.fetus != 0x80000000)
+	||
+	(settings["individualLevels"] // Split on each level enabled
+	&& current.notLevelBeaten == 0
+	&& old.notLevelBeaten == 1);
 }
 
 reset
