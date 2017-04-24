@@ -1,12 +1,12 @@
 state("SuperMeatBoy")
 {
 	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
+	byte notLevelBeaten : "SuperMeatBoy.exe", 0x1B6638;
 	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
+	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
 	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
 	byte level : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
-	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
-	byte notLevelBeaten : "SuperMeatBoy.exe", 0x1B6638;
 }
 
 startup
@@ -32,7 +32,7 @@ split
 	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
 	&& old.fetus != 0x80000000)
 	||
-	(settings["individualLevels"] // Split on each level enabled
+	(settings["individualLevels"] // "Split on each level" setting enabled
 	&& current.notLevelBeaten == 0
 	&& old.notLevelBeaten == 1);
 }
@@ -44,6 +44,6 @@ reset
 	||
 	current.uiState == 11 // State: on title screen
 	||
-	(settings["menuReset"] // Reset on main menu enabled
+	(settings["menuReset"] // "Reset on main menu" setting enabled
 	&& current.uiState == 15); // State: main menu
 }
