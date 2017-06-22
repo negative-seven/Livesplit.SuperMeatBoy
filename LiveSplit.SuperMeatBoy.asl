@@ -1,7 +1,9 @@
 state("SuperMeatBoy")
 {
 	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
-	byte notLevelBeaten : "SuperMeatBoy.exe", 0x1B6638;
+	byte playing : "SuperMeatBoy.exe", 0x1B6638;
+	byte levelBeaten : "SuperMeatBoy.exe", 0x2D54A0;
+	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
 	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
 	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
 	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
@@ -33,8 +35,13 @@ split
 	&& old.fetus != 0x80000000)
 	||
 	(settings["individualLevels"] // "Split on each level" setting enabled
-	&& current.notLevelBeaten == 0
-	&& old.notLevelBeaten == 1);
+	&& current.levelBeaten == 1
+	&& old.levelBeaten == 0)
+	||
+	(settings["individualLevels"] // "Split on each level" setting enabled
+	&& current.levelTransition == 1
+	&& old.levelTransition == 0
+	&& current.playing == 0);
 }
 
 reset
