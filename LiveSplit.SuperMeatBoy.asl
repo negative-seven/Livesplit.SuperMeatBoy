@@ -41,6 +41,7 @@ split
 	(settings["individualLevels"] // "Split on each level" setting enabled
 	&& current.levelTransition == 1
 	&& old.levelTransition == 0
+	&& current.uiState == 0 // State: inside a level
 	&& current.playing == 0);
 }
 
