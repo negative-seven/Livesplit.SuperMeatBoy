@@ -24,34 +24,68 @@ start
 
 split
 {
-	return
-	(current.uiState == 0 // State: inside a level
-	&& current.notCutscene == 0
-	&& old.notCutscene == 1
-	&& current.world != 6 // Don't split after Dr. Fetus phase 1
-	&& current.level == 99) // Inside a boss fight
-	||
-	(current.fetus == 0x80000000 // Split after Dr. Fetus phase 2 (slightly hacky but working solution)
-	&& old.fetus != 0x80000000)
-	||
-	(settings["individualLevels"] // "Split on each level" setting enabled
-	&& current.levelBeaten == 1
-	&& old.levelBeaten == 0)
-	||
-	(settings["individualLevels"] // "Split on each level" setting enabled
-	&& current.levelTransition == 1
-	&& old.levelTransition == 0
-	&& current.uiState == 0 // State: inside a level
-	&& current.playing == 0);
+	if (
+		current.uiState == 0 // State: inside a level
+		&& current.notCutscene == 0
+		&& old.notCutscene == 1
+		&& current.world != 6 // Don't split after Dr. Fetus phase 1
+		&& current.level == 99 // Inside a boss fight
+	)
+	{
+		return true;
+	}
+	
+	if (
+		current.fetus == 0x80000000 // Split after Dr. Fetus phase 2
+		&& old.fetus != 0x80000000
+	)
+	{
+		return true;
+	}
+	
+	if (settings["individualLevels"]) // "Split on each level" setting enabled
+	{
+		if (
+			current.levelBeaten == 1
+			&& old.levelBeaten == 0
+		)
+		{
+			return true;
+		}
+		
+		if (
+			current.levelTransition == 1
+			&& old.levelTransition == 0
+			&& current.uiState == 0 // State: inside a level
+			&& current.playing == 0
+		)
+		{
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 reset
 {
-	return
-	current.exit == 1 // Exiting game (only works if exiting through "Exit Game")
-	||
-	current.uiState == 11 // State: on title screen
-	||
-	(settings["menuReset"] // "Reset on main menu" setting enabled
-	&& current.uiState == 15); // State: main menu
+	if (current.exit == 1) // Exiting game (only works if exiting through "Exit Game")
+	{
+		return true;
+	}
+	
+	if (current.uiState == 11) // State: on title screen
+	{
+		return true;
+	}
+	
+	if (
+		settings["menuReset"] // "Reset on main menu" setting enabled
+		&& current.uiState == 15 // State: main menu
+	)
+	{
+		return true;
+	}
+	
+	return false;
 }
