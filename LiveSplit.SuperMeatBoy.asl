@@ -2,6 +2,7 @@ state("SuperMeatBoy")
 {
 	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
 	byte playing : "SuperMeatBoy.exe", 0x1B6638;
+	byte inSpecialLevel : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
 	byte levelBeaten : "SuperMeatBoy.exe", 0x2D54A0;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
 	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
@@ -13,8 +14,16 @@ state("SuperMeatBoy")
 
 startup
 {
-	settings.Add("menuReset", false, "Reset timer on main menu");
-	settings.Add("individualLevels", false, "Split on each level");
+	settings.Add("menuReset", false, "Reset on main menu");
+	settings.Add("individualLevels", false, "Split after each level");
+	
+	settings.Add("bossSplit", false, "Split when entering selected bosses");
+	for (int world = 1; world <= 6; world++)
+	{
+		string name = String.Format("boss{0}Split", world);
+		string description = String.Format("Split before boss {0}", world);
+		settings.Add(name, false, description, "bossSplit");
+	}
 }
 
 start
@@ -62,6 +71,18 @@ split
 		{
 			return true;
 		}
+	}
+	
+	if (
+		current.world >= 1
+		&& current.world <= 6
+		&& settings[String.Format("boss{0}Split", current.world)] // "Split on boss" setting enabled for current world
+		&& current.uiState == 7 // State: entering a level
+		&& current.inSpecialLevel == 1
+		&& old.inSpecialLevel == 0
+	)
+	{
+		return true;
 	}
 	
 	return false;
