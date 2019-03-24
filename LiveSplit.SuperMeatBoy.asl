@@ -1,4 +1,4 @@
-state("SuperMeatBoy")
+state("SuperMeatBoy", "ogversion")
 {
 	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
 	byte playing : "SuperMeatBoy.exe", 0x1B6638;
@@ -12,6 +12,11 @@ state("SuperMeatBoy")
 	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 }
 
+state ("SuperMeatBoy", "1.2.5")
+{
+	// currently unsupported
+}
+
 startup
 {
 	settings.Add("menuReset", false, "Reset on main menu");
@@ -23,6 +28,40 @@ startup
 		string name = String.Format("boss{0}Split", world);
 		string description = String.Format("Split before boss {0}", world);
 		settings.Add(name, false, description, "bossSplit");
+	}
+}
+
+init
+{
+	var mainModuleSize = modules.Where(m => m.ModuleName == "SuperMeatBoy.exe").First().ModuleMemorySize;
+	
+	switch (mainModuleSize)
+	{
+	case 0x342000:
+		version = "ogversion";
+		break;
+	case 0x33c000:
+		version = "1.2.5";
+		MessageBox.Show(
+			timer.Form,
+			"This autosplitter does not support game version 1.2.5.\n" +
+			"To switch to the supported \"ogversion\" on Steam, right click on Super Meat Boy in your library, select Properties, go to the Betas tab and choose \"ogversion\".\n" +
+			"It is not possible to revert to this version on other platforms.",
+			"Autosplitter: Unsupported game version",
+			MessageBoxButtons.OK,
+			MessageBoxIcon.Information
+		);
+		break;
+	default:
+		version = "unknown";
+		MessageBox.Show(
+			timer.Form,
+			String.Format("Cannot determine the game version. Main module size: 0x{0:x}.", mainModuleSize),
+			"Autosplitter: Unknown game version",
+			MessageBoxButtons.OK,
+			MessageBoxIcon.Error
+		);
+		break;
 	}
 }
 
