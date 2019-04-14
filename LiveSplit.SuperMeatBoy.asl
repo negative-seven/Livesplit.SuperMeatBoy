@@ -6,6 +6,7 @@ state("SuperMeatBoy", "ogversion")
 	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
 	byte levelBeaten     : "SuperMeatBoy.exe", 0x2D54A0;
 	byte exit            : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
+	int deathCount       : "SuperMeatBoy.exe", 0x2D55AC, 0x1c8c;
 	byte level           : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
 	byte uiState         : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
@@ -29,6 +30,9 @@ startup
 		string description = String.Format("Split before boss {0}", world);
 		settings.Add(name, false, description, "bossSplit");
 	}
+		
+	settings.Add("deathDisp", false, "Death count display");
+	settings.Add("createUI", true, "Create UI if needed");
 }
 
 init
@@ -62,6 +66,43 @@ init
 			MessageBoxIcon.Error
 		);
 		break;
+	}
+	
+	// LiveSplit display by @zment (from Defy Gravity auto-splitter)
+	vars.SetTextComponent = (Action<string, string, bool>)((id, text, create) =>
+	{
+		var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
+		var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
+		if (textSetting == null && create)
+		{
+			var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
+			var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
+			timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
+
+			textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
+			textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
+		}
+
+		if (textSetting != null)
+			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
+	});
+	
+	// Initialize death count
+	if (settings["deathDisp"])
+	{
+		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
+	}
+}
+
+update
+{
+	// Update death count	
+	if (
+		settings["deathDisp"]
+		&& current.deathCount != old.deathCount
+	)
+	{
+		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
 	}
 }
 
