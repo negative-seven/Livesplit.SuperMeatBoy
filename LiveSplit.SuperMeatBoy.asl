@@ -76,7 +76,7 @@ split
 		current.uiState == 0 // State: inside a level
 		&& current.notCutscene == 0
 		&& old.notCutscene == 1
-		&& current.world != 6 // Don't split after Dr. Fetus phase 1
+		&& (current.world != 6 || settings["individualLevels"]) // Don't split after Dr. Fetus phase 1 (unless using IL splits)
 		&& current.level == 99 // Inside a boss fight
 	)
 	{
