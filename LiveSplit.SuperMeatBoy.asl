@@ -1,20 +1,20 @@
 state("SuperMeatBoy", "ogversion")
 {
-	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
-	byte playing : "SuperMeatBoy.exe", 0x1B6638;
-	byte inSpecialLevel : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
-	byte levelBeaten : "SuperMeatBoy.exe", 0x2D54A0;
+	byte playing         : "SuperMeatBoy.exe", 0x1B6638;
+	byte world           : "SuperMeatBoy.exe", 0x1B7CBC;
+	byte notCutscene     : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
+	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
+	byte levelBeaten     : "SuperMeatBoy.exe", 0x2D54A0;
+	byte exit            : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
+	byte level           : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
+	byte uiState         : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
-	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
-	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
-	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
-	byte level : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
-	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
+	uint fetus           : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 }
 
 state ("SuperMeatBoy", "1.2.5")
 {
-	// currently unsupported
+	// Currently unsupported
 }
 
 startup
