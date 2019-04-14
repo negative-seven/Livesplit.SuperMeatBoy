@@ -31,7 +31,7 @@ startup
 		string description = String.Format("Split before boss {0}", world);
 		settings.Add(name, false, description, "bossSplit");
 	}
-		
+	
 	settings.Add("deathDisp", false, "Death count display");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
@@ -178,6 +178,7 @@ start
 
 split
 {
+	// Boss completion splits
 	if (
 		current.uiState == 0 // State: inside a level
 		&& current.notCutscene == 0
@@ -189,6 +190,7 @@ split
 		return true;
 	}
 	
+	// Any% ending split
 	if (
 		current.fetus == 0x80000000 // Split after Dr. Fetus phase 2
 		&& old.fetus != 0x80000000
@@ -197,8 +199,10 @@ split
 		return true;
 	}
 	
+	// IL splits
 	if (settings["individualLevels"]) // "Split on each level" setting enabled
 	{
+		// When continuing to next level
 		if (
 			current.levelBeaten == 1
 			&& old.levelBeaten == 0
@@ -207,6 +211,7 @@ split
 			return true;
 		}
 		
+		// When using keyboard "S" to exit to map
 		if (
 			current.levelTransition == 1
 			&& old.levelTransition == 0
@@ -218,6 +223,7 @@ split
 		}
 	}
 	
+	// Boss entrance splits
 	if (
 		current.world >= 1
 		&& current.world <= 6
