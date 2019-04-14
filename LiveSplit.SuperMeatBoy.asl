@@ -1,6 +1,7 @@
 state("SuperMeatBoy", "ogversion")
 {
 	byte playing         : "SuperMeatBoy.exe", 0x1B6638;
+	float ILTime         : "SuperMeatBoy.exe", 0x1B6A88;
 	byte world           : "SuperMeatBoy.exe", 0x1B7CBC;
 	byte notCutscene     : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
 	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
@@ -32,6 +33,10 @@ startup
 	}
 		
 	settings.Add("deathDisp", false, "Death count display");
+	
+	settings.Add("ilDisp", false, "Last IL Time display");
+	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
+	
 	settings.Add("createUI", true, "Create UI if needed");
 }
 
@@ -87,11 +92,61 @@ init
 			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
 	});
 	
+	// Format and Display a given float value
+	vars.DisplaySeconds = (Action<string, float>)((name, f) =>
+	{
+		int decimalPlaces = 3;
+		
+		// Convert float to string
+		string s;
+		s = f.ToString();
+		
+		// Find where the decimal place is, if at all
+		int decimalLocation = -1;
+		for (int i = 0; i < s.Length; i++)
+		{
+			if (s[i] == '.')
+			{
+				decimalLocation = i;
+			}
+		}
+		
+		// Add a decimal place, if absent (EG "5" -> "5.")
+		if (decimalLocation == -1)
+		{
+			decimalLocation = s.Length;
+			s += ".";
+		}
+		
+		// Define length of final string
+		int finalLength = decimalLocation + 1 + decimalPlaces;
+		
+		// Concatenate '0's to reach final length, if needed
+		while (s.Length < finalLength )
+		{
+			s += '0';
+		}		
+		
+		// Truncate
+		string t = "";
+		for (int i = 0; i < finalLength; i++)
+		{
+			t += s[i];
+		}
+		s = t;
+		
+		// Display final string
+		vars.SetTextComponent(name, s, settings["createUI"]);
+	});
+	
 	// Initialize death count
 	if (settings["deathDisp"])
 	{
 		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
 	}
+	
+	// Initialize IL display
+	vars.DisplaySeconds("Last IL Time", 0f);
 }
 
 update
@@ -103,6 +158,16 @@ update
 	)
 	{
 		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
+	}
+	
+	// Update IL display
+	if (
+		settings["ilDisp"]
+		&& old.ILTime == 100000000 // ILTime stays at 100000000 while playing the level
+		&& current.ILTime != 100000000 // When the level is completed, ILTime contains your... IL time lol
+	)
+	{
+		vars.DisplaySeconds("Last IL Time", current.ILTime);
 	}
 }
 
