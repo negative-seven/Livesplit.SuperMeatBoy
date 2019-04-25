@@ -88,53 +88,6 @@ init
 			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
 	});
 	
-	// Format and Display a given float value
-	vars.DisplaySeconds = (Action<string, float>)((name, f) =>
-	{
-		int decimalPlaces = 3;
-		
-		// Convert float to string
-		string s;
-		s = f.ToString();
-		
-		// Find where the decimal place is, if at all
-		int decimalLocation = -1;
-		for (int i = 0; i < s.Length; i++)
-		{
-			if (s[i] == '.')
-			{
-				decimalLocation = i;
-			}
-		}
-		
-		// Add a decimal place, if absent (EG "5" -> "5.")
-		if (decimalLocation == -1)
-		{
-			decimalLocation = s.Length;
-			s += ".";
-		}
-		
-		// Define length of final string
-		int finalLength = decimalLocation + 1 + decimalPlaces;
-		
-		// Concatenate '0's to reach final length, if needed
-		while (s.Length < finalLength )
-		{
-			s += '0';
-		}		
-		
-		// Truncate
-		string t = "";
-		for (int i = 0; i < finalLength; i++)
-		{
-			t += s[i];
-		}
-		s = t;
-		
-		// Display final string
-		vars.SetTextComponent(name, s, settings["createUI"]);
-	});
-	
 	// Initialize death count
 	if (settings["deathDisp"])
 	{
@@ -142,7 +95,7 @@ init
 	}
 	
 	// Initialize IL display
-	vars.DisplaySeconds("Last IL Time", 0f);
+	vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f), settings["createUI"]);
 }
 
 update
@@ -163,7 +116,7 @@ update
 		&& current.ILTime != 100000000 // When the level is completed, ILTime contains your... IL time lol
 	)
 	{
-		vars.DisplaySeconds("Last IL Time", current.ILTime);
+		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime), settings["createUI"]);
 	}
 }
 
