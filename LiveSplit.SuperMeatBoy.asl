@@ -94,7 +94,10 @@ init
 	}
 	
 	// Initialize IL display
-	vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
+	if (settings["ilDisp"])
+	{
+		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
+	}
 }
 
 update
