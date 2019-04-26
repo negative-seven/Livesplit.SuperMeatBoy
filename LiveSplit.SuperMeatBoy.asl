@@ -33,7 +33,6 @@ startup
 	settings.Add("deathDisp", false, "Death count display");
 	settings.Add("ilDisp", false, "Last IL Time display");
 		settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
-	settings.Add("createUI", true, "Create UI if needed");
 }
 
 init
@@ -70,11 +69,11 @@ init
 	}
 	
 	// LiveSplit display by @zment (from Defy Gravity auto-splitter)
-	vars.SetTextComponent = (Action<string, string, bool>)((id, text, create) =>
+	vars.SetTextComponent = (Action<string, string>)((id, text) =>
 	{
 		var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
 		var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
-		if (textSetting == null && create)
+		if (textSetting == null)
 		{
 			var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
 			var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
@@ -91,11 +90,11 @@ init
 	// Initialize death count
 	if (settings["deathDisp"])
 	{
-		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
+		vars.SetTextComponent("Deaths", current.deathCount.ToString());
 	}
 	
 	// Initialize IL display
-	vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f), settings["createUI"]);
+	vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
 }
 
 update
@@ -106,7 +105,7 @@ update
 		&& current.deathCount != old.deathCount
 	)
 	{
-		vars.SetTextComponent("Deaths", current.deathCount.ToString(), settings["createUI"]);
+		vars.SetTextComponent("Deaths", current.deathCount.ToString());
 	}
 	
 	// Update IL display
@@ -116,7 +115,7 @@ update
 		&& current.ILTime != 100000000 // When the level is completed, ILTime contains your... IL time lol
 	)
 	{
-		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime), settings["createUI"]);
+		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
 	}
 }
 
