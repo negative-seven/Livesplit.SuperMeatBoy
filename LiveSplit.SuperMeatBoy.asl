@@ -1,34 +1,38 @@
 state("SuperMeatBoy", "ogversion")
 {
-	byte uiState : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
-	byte playing : "SuperMeatBoy.exe", 0x1B6638;
-	byte inSpecialLevel : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
-	byte levelBeaten : "SuperMeatBoy.exe", 0x2D54A0;
+	byte playing         : "SuperMeatBoy.exe", 0x1B6638;
+	float ILTime         : "SuperMeatBoy.exe", 0x1B6A88;
+	byte world           : "SuperMeatBoy.exe", 0x1B7CBC;
+	byte notCutscene     : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
+	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
+	byte levelBeaten     : "SuperMeatBoy.exe", 0x2D54A0;
+	byte exit            : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
+	int deathCount       : "SuperMeatBoy.exe", 0x2D55AC, 0x1c8c;
+	byte level           : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
+	byte uiState         : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
-	byte notCutscene : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
-	byte exit : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
-	byte world : "SuperMeatBoy.exe", 0x1B7CBC;
-	byte level : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
-	uint fetus : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
+	uint fetus           : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
 }
 
 state ("SuperMeatBoy", "1.2.5")
 {
-	// currently unsupported
+	// Currently unsupported
 }
 
 startup
 {
 	settings.Add("menuReset", false, "Reset on main menu");
 	settings.Add("individualLevels", false, "Split after each level");
-	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
-	for (int world = 1; world <= 6; world++)
-	{
-		string name = String.Format("boss{0}Split", world);
-		string description = String.Format("Split before boss {0}", world);
-		settings.Add(name, false, description, "bossSplit");
-	}
+		for (int world = 1; world <= 6; world++)
+		{
+			string name = String.Format("boss{0}Split", world);
+			string description = String.Format("Split before boss {0}", world);
+			settings.Add(name, false, description, "bossSplit");
+		}
+	settings.Add("deathDisp", false, "Death count display");
+	settings.Add("ilDisp", false, "Last IL Time display");
+		settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
 }
 
 init
@@ -63,6 +67,59 @@ init
 		);
 		break;
 	}
+	
+	// LiveSplit display by @zment (from Defy Gravity auto-splitter)
+	vars.SetTextComponent = (Action<string, string>)((id, text) =>
+	{
+		var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
+		var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
+		if (textSetting == null)
+		{
+			var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
+			var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
+			timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
+
+			textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
+			textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
+		}
+
+		if (textSetting != null)
+			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
+	});
+	
+	// Initialize death count
+	if (settings["deathDisp"])
+	{
+		vars.SetTextComponent("Deaths", current.deathCount.ToString());
+	}
+	
+	// Initialize IL display
+	if (settings["ilDisp"])
+	{
+		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
+	}
+}
+
+update
+{
+	// Update death count	
+	if (
+		settings["deathDisp"]
+		&& current.deathCount != old.deathCount
+	)
+	{
+		vars.SetTextComponent("Deaths", current.deathCount.ToString());
+	}
+	
+	// Update IL display
+	if (
+		settings["ilDisp"]
+		&& old.ILTime == 100000000 // ILTime stays at 100000000 while playing the level
+		&& current.ILTime != 100000000 // When the level is completed, ILTime contains your... IL time lol
+	)
+	{
+		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
+	}
 }
 
 start
@@ -72,17 +129,19 @@ start
 
 split
 {
+	// Boss completion splits
 	if (
 		current.uiState == 0 // State: inside a level
 		&& current.notCutscene == 0
 		&& old.notCutscene == 1
-		&& current.world != 6 // Don't split after Dr. Fetus phase 1
+		&& (current.world != 6 || settings["individualLevels"]) // Don't split after Dr. Fetus phase 1 (unless using IL splits)
 		&& current.level == 99 // Inside a boss fight
 	)
 	{
 		return true;
 	}
 	
+	// Any% ending split
 	if (
 		current.fetus == 0x80000000 // Split after Dr. Fetus phase 2
 		&& old.fetus != 0x80000000
@@ -91,8 +150,10 @@ split
 		return true;
 	}
 	
+	// IL splits
 	if (settings["individualLevels"]) // "Split on each level" setting enabled
 	{
+		// When continuing to next level
 		if (
 			current.levelBeaten == 1
 			&& old.levelBeaten == 0
@@ -101,6 +162,7 @@ split
 			return true;
 		}
 		
+		// When using keyboard "S" to exit to map
 		if (
 			current.levelTransition == 1
 			&& old.levelTransition == 0
@@ -112,6 +174,7 @@ split
 		}
 	}
 	
+	// Boss entrance splits
 	if (
 		current.world >= 1
 		&& current.world <= 6
