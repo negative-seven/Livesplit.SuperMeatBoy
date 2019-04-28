@@ -1,17 +1,17 @@
 state("SuperMeatBoy", "ogversion")
 {
-	byte playing         : "SuperMeatBoy.exe", 0x1B6638;
-	float ILTime         : "SuperMeatBoy.exe", 0x1B6A88;
-	byte world           : "SuperMeatBoy.exe", 0x1B7CBC;
-	byte notCutscene     : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A0;
-	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2D4C6C, 0x3A4;
-	byte levelBeaten     : "SuperMeatBoy.exe", 0x2D54A0;
-	byte exit            : "SuperMeatBoy.exe", 0x2D54BC, 0x14;
-	int deathCount       : "SuperMeatBoy.exe", 0x2D55AC, 0x1c8c;
-	byte level           : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D0;
-	byte uiState         : "SuperMeatBoy.exe", 0x2D5EA0, 0x8D4;
-	byte levelTransition : "SuperMeatBoy.exe", 0x2D5EA8;
-	uint fetus           : "SuperMeatBoy.exe", 0x2D64BC, 0x10C;
+	byte playing         : "SuperMeatBoy.exe", 0x1b6638;
+	float ILTime         : "SuperMeatBoy.exe", 0x1b6a88;
+	byte world           : "SuperMeatBoy.exe", 0x1b7cbc;
+	byte notCutscene     : "SuperMeatBoy.exe", 0x2d4c6c, 0x3a0;
+	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2d4c6c, 0x3a4;
+	byte levelBeaten     : "SuperMeatBoy.exe", 0x2d54a0;
+	byte exit            : "SuperMeatBoy.exe", 0x2d54bc, 0x14;
+	int deathCount       : "SuperMeatBoy.exe", 0x2d55ac, 0x1c8c;
+	byte level           : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d0;
+	byte uiState         : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d4;
+	byte levelTransition : "SuperMeatBoy.exe", 0x2d5ea8;
+	uint fetus           : "SuperMeatBoy.exe", 0x2d64bc, 0x10c;
 }
 
 state ("SuperMeatBoy", "1.2.5")
