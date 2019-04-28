@@ -104,6 +104,12 @@ init
 
 update
 {
+	// Disable script on invalid/unsupported game version
+	if (version != "ogversion")
+	{
+		return false;
+	}
+	
 	// Update death count	
 	if (
 		settings["deathDisp"]
@@ -122,6 +128,8 @@ update
 	{
 		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
 	}
+	
+	return true;
 }
 
 start
