@@ -33,6 +33,27 @@ startup
 	settings.Add("deathDisp", false, "Death count display");
 	settings.Add("ilDisp", false, "Last IL Time display");
 		settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
+	
+	
+	
+	// LiveSplit display by @zment (from Defy Gravity auto-splitter)
+	vars.SetTextComponent = (Action<string, string>)((id, text) =>
+	{
+		var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
+		var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
+		if (textSetting == null)
+		{
+			var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
+			var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
+			timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
+
+			textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
+			textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
+		}
+
+		if (textSetting != null)
+			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
+	});
 }
 
 init
@@ -67,25 +88,6 @@ init
 		);
 		break;
 	}
-	
-	// LiveSplit display by @zment (from Defy Gravity auto-splitter)
-	vars.SetTextComponent = (Action<string, string>)((id, text) =>
-	{
-		var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
-		var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
-		if (textSetting == null)
-		{
-			var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
-			var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
-			timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
-
-			textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
-			textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
-		}
-
-		if (textSetting != null)
-			textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
-	});
 	
 	// Initialize death count
 	if (settings["deathDisp"])
