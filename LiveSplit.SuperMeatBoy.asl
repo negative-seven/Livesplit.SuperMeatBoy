@@ -22,17 +22,21 @@ state ("SuperMeatBoy", "1.2.5")
 startup
 {
 	settings.Add("menuReset", false, "Reset on main menu");
+	
 	settings.Add("individualLevels", false, "Split after each level");
+	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
-		for (int world = 1; world <= 6; world++)
-		{
-			string name = String.Format("boss{0}Split", world);
-			string description = String.Format("Split before boss {0}", world);
-			settings.Add(name, false, description, "bossSplit");
-		}
+	for (int world = 1; world <= 6; world++)
+	{
+		string name = String.Format("boss{0}Split", world);
+		string description = String.Format("Split before boss {0}", world);
+		settings.Add(name, false, description, "bossSplit");
+	}
+	
 	settings.Add("deathDisp", false, "Death count display");
+	
 	settings.Add("ilDisp", false, "Last IL Time display");
-		settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
+	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
 	
 	
 	
