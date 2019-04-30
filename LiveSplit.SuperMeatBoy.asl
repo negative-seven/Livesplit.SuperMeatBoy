@@ -265,12 +265,13 @@ split
 		&& (
 			(
 				current.world == 6
-				&& current.level == 4
+				&& current.level == 4 // Be in either last level of The End or...
 			)
-			|| current.level == 19
+			|| current.level == 19 // Last level of any other world.
 		)
-		&& current.playing == 0
-		&& old.playing == 1
+		&& old.playing == 1 // Ensures you were playing a level
+		&& old.ILTime == 100000000 // Changes to IL time upon level completion
+		&& current.ILTime != 100000000
 	)
 	{
 		return true;
