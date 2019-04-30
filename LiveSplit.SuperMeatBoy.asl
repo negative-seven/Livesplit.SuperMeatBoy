@@ -24,9 +24,9 @@ startup
 {
 	settings.Add("menuReset", false, "Reset on main menu");
 	
-	settings.Add("ilSplit", false, "Split after each level");
+	settings.Add("ilSplit", false, "Split after every level");
 	
-	settings.Add("iwSplit", false, "IW start & end split (character selection screen must be unlocked)");
+	settings.Add("iwSplit", false, "IW start & end split");
 	settings.Add("iwSplit_FirstLvl", true, "Only start on first level of world", "iwSplit");
 	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
