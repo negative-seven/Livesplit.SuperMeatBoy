@@ -34,6 +34,7 @@ startup
 	}
 	
 	settings.Add("deathDisp", false, "Death count display");
+	settings.Add("deathDispNorm", true, "Normalize to 0 on timer start", "deathDisp");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
 	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
@@ -93,10 +94,23 @@ init
 		break;
 	}
 	
+	// Code to execute on startup
+	vars.timer_OnStart = (EventHandler)((s, e) =>
+    {
+		// Set death count normalization on timer start
+		if (settings["deathDispNorm"])
+		{
+			vars.deathCountOffset = old.deathCount;
+			vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
+		}
+    });
+    timer.OnStart += vars.timer_OnStart;
+	
 	// Initialize death count
 	if (settings["deathDisp"])
 	{
 		vars.SetTextComponent("Deaths", current.deathCount.ToString());
+		vars.deathCountOffset = 0; // Used to store death count on timer start, for normalization
 	}
 	
 	// Initialize IL display
@@ -104,6 +118,12 @@ init
 	{
 		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
 	}
+}
+
+shutdown
+{
+	// Unsubscribe startup event for death count normalization
+	timer.OnStart -= vars.timer_OnStart;
 }
 
 update
@@ -120,7 +140,7 @@ update
 		&& current.deathCount != old.deathCount
 	)
 	{
-		vars.SetTextComponent("Deaths", current.deathCount.ToString());
+		vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
 	}
 	
 	// Update IL display
