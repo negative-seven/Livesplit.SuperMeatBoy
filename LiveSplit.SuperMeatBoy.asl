@@ -26,6 +26,7 @@ startup
 	settings.Add("ilSplit", false, "Split after each level");
 	
 	settings.Add("iwSplit", false, "IW start & end split (character selection screen must be unlocked)");
+	settings.Add("iwSplit_FirstLvl", true, "Only start on first level of world", "iwSplit");
 	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
 	for (int world = 1; world <= 6; world++)
@@ -191,6 +192,10 @@ start
 				&& current.uiState == 7 // State: directly entering level through world map
 				&& old.uiState == 1 // State: in world map
 			)
+		)
+		&& ( // Require being on first level of world for IW start, unless the option is off
+			current.level == 0
+			|| !settings["iwSplit_FirstLvl"]
 		)
 	)
 	{
