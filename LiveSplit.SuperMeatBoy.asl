@@ -116,7 +116,7 @@ init
 	// Initialize IL display
 	if (settings["ilDisp"])
 	{
-		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", 0f));
+		vars.SetTextComponent("Last IL Time", "[none]");
 	}
 }
 
@@ -150,7 +150,14 @@ update
 		&& current.ILTime != 100000000 // When the level is completed, ILTime contains your... IL time lol
 	)
 	{
-		vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
+		if (current.ILTime == 0f)
+		{
+			vars.SetTextComponent("Last IL Time", "[timer glitch]");
+		}
+		else
+		{
+			vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
+		}
 	}
 	
 	return true;
