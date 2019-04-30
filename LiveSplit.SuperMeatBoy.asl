@@ -23,8 +23,8 @@ startup
 {
 	settings.Add("menuReset", false, "Reset on main menu");
 	
-	settings.Add("individualLevels", false, "Split after each level");
-	settings.Add("individualWorld", false, "IW splits (character selection screen must be unlocked)", "individualLevels");
+	settings.Add("ilSplit", false, "Split after each level");
+	settings.Add("iwSplit", false, "IW start & end split (character selection screen must be unlocked)", "ilSplit");
 	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
 	for (int world = 1; world <= 6; world++)
@@ -35,7 +35,7 @@ startup
 	}
 	
 	settings.Add("deathDisp", false, "Death count display");
-	settings.Add("deathDispNorm", true, "Normalize to 0 on timer start", "deathDisp");
+	settings.Add("deathDisp_Norm", true, "Normalize to 0 on timer start", "deathDisp");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
 	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
@@ -99,7 +99,7 @@ init
 	vars.timer_OnStart = (EventHandler)((s, e) =>
     {
 		// Set death count normalization on timer start
-		if (settings["deathDispNorm"])
+		if (settings["deathDisp_Norm"])
 		{
 			vars.deathCountOffset = old.deathCount;
 			vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
@@ -168,7 +168,7 @@ start
 {
 	// Fullgame start
 	if (
-		!settings["individualWorld"]
+		!settings["iwSplit"]
 		&& current.uiState == 13 // State: pressed "Start Game"
 	) 
 	{
@@ -177,7 +177,7 @@ start
 	
 	// IW start
 	if (
-		settings["individualWorld"]
+		settings["iwSplit"]
 		&& (
 			( // Case: worlds with characters enabled
 				current.world >= 1
@@ -206,7 +206,7 @@ split
 		current.uiState == 0 // State: inside a level
 		&& current.notCutscene == 0
 		&& old.notCutscene == 1
-		&& (current.world != 6 || settings["individualLevels"]) // Don't split after Dr. Fetus phase 1 (unless using IL splits)
+		&& (current.world != 6 || settings["ilSplit"]) // Don't split after Dr. Fetus phase 1 (unless using IL splits)
 		&& current.level == 99 // Inside a boss fight
 	)
 	{
@@ -223,7 +223,7 @@ split
 	}
 	
 	// IL splits
-	if (settings["individualLevels"]) // "Split on each level" setting enabled
+	if (settings["ilSplit"]) // "Split on each level" setting enabled
 	{
 		// When continuing to next level
 		if (
@@ -261,7 +261,7 @@ split
 
 	// IW ending split
 	if (
-		settings["individualWorld"]
+		settings["iwSplit"]
 		&& (
 			(
 				current.world == 6
