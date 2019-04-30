@@ -8,6 +8,7 @@ state("SuperMeatBoy", "ogversion")
 	byte levelBeaten     : "SuperMeatBoy.exe", 0x2d54a0;
 	byte exit            : "SuperMeatBoy.exe", 0x2d54bc, 0x14;
 	int deathCount       : "SuperMeatBoy.exe", 0x2d55ac, 0x1c8c;
+	int characters       : "SuperMeatBoy.exe", 0x2d55ac, 0x1d24;
 	byte level           : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d0;
 	byte uiState         : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2d5ea8;
@@ -181,15 +182,20 @@ start
 	if (
 		settings["iwSplit"]
 		&& (
-			( // Case: worlds with characters enabled
-				current.world >= 1
-				&& current.world <= 5
+			( // Case: Character select screen is unlocked
+				current.characters != 1 // Characters other than meatboy are unlocked
+				&& old.uiState == 4 // State: in character select
 				&& current.uiState == 5 // State: entering level through character select
 			)
-			|| ( // Case: worlds with characters disabled
-				current.world >= 6
-				&& current.world <= 7
-				&& current.uiState == 7 // State: directly entering level through world map
+			|| ( // Case: No character select screen
+				( 
+					current.characters == 1 // Only meatboy is unlocked
+					|| ( // Exception: if you are on End or Cotton other characters can be unlocked
+						current.world >= 6 
+						&& current.world <= 7
+					)
+				)
+				&& current.uiState == 7 // State: entering level in world map
 				&& old.uiState == 1 // State: in world map
 			)
 		)
@@ -257,7 +263,7 @@ split
 		current.world >= 1
 		&& current.world <= 6
 		&& settings[String.Format("boss{0}Split", current.world)] // "Split on boss" setting enabled for current world
-		&& current.uiState == 7 // State: directly entering level through world map
+		&& current.uiState == 7 // State: entering level in world map
 		&& current.inSpecialLevel == 1
 		&& old.inSpecialLevel == 0
 	)
