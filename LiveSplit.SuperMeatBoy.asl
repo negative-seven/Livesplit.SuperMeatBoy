@@ -24,6 +24,7 @@ startup
 	settings.Add("menuReset", false, "Reset on main menu");
 	
 	settings.Add("individualLevels", false, "Split after each level");
+	settings.Add("individualWorld", false, "IW splits (character selection screen must be unlocked)", "individualLevels");
 	
 	settings.Add("bossSplit", false, "Split when entering selected bosses");
 	for (int world = 1; world <= 6; world++)
@@ -165,7 +166,37 @@ update
 
 start
 {
-	return current.uiState == 13; // State: pressed "Start Game"
+	// Fullgame start
+	if (
+		!settings["individualWorld"]
+		&& current.uiState == 13 // State: pressed "Start Game"
+	) 
+	{
+		return true;
+	}
+	
+	// IW start
+	if (
+		settings["individualWorld"]
+		&& (
+			( // Case: worlds with characters enabled
+				current.world >= 1
+				&& current.world <= 5
+				&& current.uiState == 5 // State: entering level through character select
+			)
+			|| ( // Case: worlds with characters disabled
+				current.world >= 6
+				&& current.world <= 7
+				&& current.uiState == 7 // State: directly entering level through world map
+				&& old.uiState == 1 // State: in world map
+			)
+		)
+	)
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 split
@@ -220,13 +251,30 @@ split
 		current.world >= 1
 		&& current.world <= 6
 		&& settings[String.Format("boss{0}Split", current.world)] // "Split on boss" setting enabled for current world
-		&& current.uiState == 7 // State: entering a level
+		&& current.uiState == 7 // State: directly entering level through world map
 		&& current.inSpecialLevel == 1
 		&& old.inSpecialLevel == 0
 	)
 	{
 		return true;
 	}
+
+	// IW ending split
+	if (
+		settings["individualWorld"]
+		&& (
+			(
+				current.world == 6
+				&& current.level == 4
+			)
+			|| current.level == 19
+		)
+		&& current.playing == 0
+		&& old.playing == 1
+	)
+	{
+		return true;
+	} 
 	
 	return false;
 }
