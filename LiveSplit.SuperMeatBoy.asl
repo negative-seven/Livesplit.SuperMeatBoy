@@ -7,6 +7,7 @@ state("SuperMeatBoy", "ogversion")
 	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2d4c6c, 0x3a4;
 	byte levelBeaten     : "SuperMeatBoy.exe", 0x2d54a0;
 	byte exit            : "SuperMeatBoy.exe", 0x2d54bc, 0x14;
+	byte fetusType       : "SuperMeatBoy.exe", 0x2d54bc, 0x2D2;
 	int deathCount       : "SuperMeatBoy.exe", 0x2d55ac, 0x1c8c;
 	int characters       : "SuperMeatBoy.exe", 0x2d55ac, 0x1d24;
 	byte level           : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d0;
@@ -29,9 +30,10 @@ startup
 	settings.Add("iwSplit", false, "IW start & end split");
 	settings.Add("iwSplit_FirstLvl", true, "Only start on first level of world", "iwSplit");
 	
-	settings.Add("bossSplit", false, "Split for selected bosses");
-	settings.Add("bossSplit_loc", false, "No: Split when entering | Yes: Split on unlock", "bossSplit");
-	settings.SetToolTip("bossSplit_loc", "Adds Dark Ending functionality. Necessary for legacy splits");
+	settings.Add("deSplit", false, "Dark Ending mode");
+	settings.SetToolTip("deSplit", "Splits when boss unlocks for ch1-5 and disables light fetus split. \nYou don't need to enable this if you are already splitting on every level");
+	
+	settings.Add("bossSplit", false, "Split when entering selected bosses");
 	for (int world = 1; world <= 6; world++)
 	{
 		string name = String.Format("boss{0}Split", world);
@@ -230,10 +232,17 @@ split
 		return true;
 	}
 	
-	// Any% ending split
+	// Final cutscene splits
 	if (
 		current.fetus == 0x80000000 // Split after Dr. Fetus phase 2
 		&& old.fetus != 0x80000000
+		&& (
+			!( // Do not split on light fetus when Dark Ending splits are enabled
+				current.fetusType == 0
+				&& settings["deSplit"]
+			)
+			|| settings["ilSplit"] // ...Unless you have IL splits enabled
+		)
 	)
 	{
 		return true;
@@ -263,24 +272,14 @@ split
 		}
 	}
 	
-	// Boss entrance/unlock splits
+	// Boss entrance splits
 	if (
 		current.world >= 1
 		&& current.world <= 6
 		&& settings[String.Format("boss{0}Split", current.world)] // "Split on boss" setting enabled for current world
-		&& (
-			( // Split when entering
-				!settings["bossSplit_loc"]
-				&& current.uiState == 7 // State: entering level in world map
-				&& current.inSpecialLevel == 1
-				&& old.inSpecialLevel == 0
-			)
-			|| ( // Split on unlock
-				settings["bossSplit_loc"]
-				&& old.uiState == 0 // State: inside a level
-				&& current.uiState == 22 // State: boss unlocking on world map
-			)
-		)
+		&& current.uiState == 7 // State: entering level in world map
+		&& current.inSpecialLevel == 1
+		&& old.inSpecialLevel == 0
 	)
 	{
 		return true;
@@ -302,7 +301,20 @@ split
 	)
 	{
 		return true;
-	} 
+	}
+	
+	// Dark Ending splits
+	if (
+		settings["deSplit"]
+		&& !settings["ilSplit"] // IL splits make this redundant
+		&& old.uiState == 0 // State: inside a level
+		&& current.uiState == 22 // State: boss unlocking on world map
+		&& current.world >= 1
+		&& current.world <= 5
+	)
+	{
+		return true;
+	}
 	
 	return false;
 }
