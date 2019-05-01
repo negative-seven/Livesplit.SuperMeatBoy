@@ -29,11 +29,13 @@ startup
 	settings.Add("iwSplit", false, "IW start & end split");
 	settings.Add("iwSplit_FirstLvl", true, "Only start on first level of world", "iwSplit");
 	
-	settings.Add("bossSplit", false, "Split when entering selected bosses");
+	settings.Add("bossSplit", false, "Split for selected bosses");
+	settings.Add("bossSplit_loc", false, "No: Split when entering | Yes: Split on unlock", "bossSplit");
+	settings.SetToolTip("bossSplit_loc", "Adds Dark Ending functionality. Necessary for legacy splits");
 	for (int world = 1; world <= 6; world++)
 	{
 		string name = String.Format("boss{0}Split", world);
-		string description = String.Format("Split before boss {0}", world);
+		string description = String.Format("Boss {0}", world);
 		settings.Add(name, false, description, "bossSplit");
 	}
 	
@@ -137,6 +139,9 @@ update
 	{
 		return false;
 	}
+	
+	// uiState debug output
+	// if (old.uiState != current.uiState) {print("uiState: " + old.uiState.ToString() + "->" + current.uiState.ToString());}
 	
 	// Update death count	
 	if (
@@ -258,14 +263,24 @@ split
 		}
 	}
 	
-	// Boss entrance splits
+	// Boss entrance/unlock splits
 	if (
 		current.world >= 1
 		&& current.world <= 6
 		&& settings[String.Format("boss{0}Split", current.world)] // "Split on boss" setting enabled for current world
-		&& current.uiState == 7 // State: entering level in world map
-		&& current.inSpecialLevel == 1
-		&& old.inSpecialLevel == 0
+		&& (
+			( // Split when entering
+				!settings["bossSplit_loc"]
+				&& current.uiState == 7 // State: entering level in world map
+				&& current.inSpecialLevel == 1
+				&& old.inSpecialLevel == 0
+			)
+			|| ( // Split on unlock
+				settings["bossSplit_loc"]
+				&& old.uiState == 0 // State: inside a level
+				&& current.uiState == 22 // State: boss unlocking on world map
+			)
+		)
 	)
 	{
 		return true;
