@@ -7,7 +7,7 @@ state("SuperMeatBoy", "ogversion")
 	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x2d4c6c, 0x3a4;
 	byte levelBeaten     : "SuperMeatBoy.exe", 0x2d54a0;
 	byte exit            : "SuperMeatBoy.exe", 0x2d54bc, 0x14;
-	byte fetusType       : "SuperMeatBoy.exe", 0x2d54bc, 0x2D2;
+	byte fetusType       : "SuperMeatBoy.exe", 0x2d54bc, 0x2d2;
 	int deathCount       : "SuperMeatBoy.exe", 0x2d55ac, 0x1c8c;
 	int characters       : "SuperMeatBoy.exe", 0x2d55ac, 0x1d24;
 	byte level           : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d0;
