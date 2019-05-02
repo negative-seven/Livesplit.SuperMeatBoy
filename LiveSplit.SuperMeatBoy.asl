@@ -104,15 +104,15 @@ init
 	
 	// Code to execute on startup
 	vars.timer_OnStart = (EventHandler)((s, e) =>
-    {
+	{
 		// Set death count normalization on timer start
 		if (settings["deathDisp_Norm"])
 		{
 			vars.deathCountOffset = old.deathCount;
 			vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
 		}
-    });
-    timer.OnStart += vars.timer_OnStart;
+	});
+	timer.OnStart += vars.timer_OnStart;
 	
 	// Initialize death count
 	if (settings["deathDisp"])
