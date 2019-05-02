@@ -151,6 +151,11 @@ update
 		&& current.deathCount != old.deathCount
 	)
 	{
+		if (current.deathCount <  old.deathCount) // Prevents normalization from displaying negative values on game close
+		{
+			vars.deathCountOffset = 0;
+		}
+		
 		vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
 	}
 	
