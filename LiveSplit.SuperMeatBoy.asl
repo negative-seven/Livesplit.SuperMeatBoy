@@ -127,10 +127,26 @@ init
 	}
 }
 
-shutdown
+shutdown // Autosplitter close
 {
 	// Unsubscribe startup event for death count normalization
 	timer.OnStart -= vars.timer_OnStart;
+}
+
+exit // Game close
+{
+	// Clear death count on game close
+	if (settings["deathDisp"])
+	{
+		vars.SetTextComponent("Deaths", "-");
+		vars.deathCountOffset = 0; // Reset normalization
+	}
+	
+	// Clear Last IL Time on game close
+	if (settings["ilDisp"])
+	{
+		vars.SetTextComponent("Last IL Time", "-");
+	}
 }
 
 update
@@ -147,14 +163,9 @@ update
 	// Update death count	
 	if (
 		settings["deathDisp"]
-		&& current.deathCount != old.deathCount
+		&& current.deathCount > old.deathCount
 	)
 	{
-		if (current.deathCount <  old.deathCount) // Prevents normalization from displaying negative values on game close
-		{
-			vars.deathCountOffset = 0;
-		}
-		
 		vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
 	}
 	
