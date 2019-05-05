@@ -42,7 +42,6 @@ startup
 	}
 	
 	settings.Add("deathDisp", false, "Death count display");
-	settings.Add("deathDisp_Norm", true, "Normalize to 0 on timer start", "deathDisp");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
 	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
@@ -106,7 +105,7 @@ init
 	vars.timer_OnStart = (EventHandler)((s, e) =>
 	{
 		// Set death count normalization on timer start
-		if (settings["deathDisp_Norm"])
+		if (settings["deathDisp"])
 		{
 			vars.deathCountOffset = old.deathCount;
 			vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
