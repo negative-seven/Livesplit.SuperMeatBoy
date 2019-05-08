@@ -1,3 +1,11 @@
+// ---------------Credits--------------
+//            -7: creator
+//   Thermospore: displays, DE splits
+//        zment4: display framework
+//      6DPSMETA: IW splits
+// SMB community: feedback, bug reports
+// ------------------------------------
+
 state("SuperMeatBoy", "ogversion")
 {
 	byte playing         : "SuperMeatBoy.exe", 0x1b6638;
