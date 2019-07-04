@@ -303,15 +303,18 @@ split
 			return true;
 		}
 		
-		// When entering a warp zone
+		// When entering a warp zone from inside a level
 		if (
-			(
-				current.lvlType == 2 // Type: in a bandage warp zone
-				&& old.lvlType != 2
-			)
-			|| (
-				current.lvlType == 3 // Type: in a character warp zone
-				&& old.lvlType != 3
+			current.uiState == 0 // State: inside a level
+			&& (
+				(
+					current.lvlType == 2 // Type: in a bandage warp zone
+					&& old.lvlType != 2
+				)
+				|| (
+					current.lvlType == 3 // Type: in a character warp zone
+					&& old.lvlType != 3
+				)
 			)
 		)
 		{
