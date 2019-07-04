@@ -23,6 +23,7 @@ state("SuperMeatBoy", "ogversion")
 	byte uiState         : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2d5ea8;
 	uint fetus           : "SuperMeatBoy.exe", 0x2d64bc, 0x10c;
+	int lvlType          : "SuperMeatBoy.exe", 0x2d54bc, 0x1ac;
 }
 
 state ("SuperMeatBoy", "1.2.5")
@@ -297,6 +298,21 @@ split
 			&& old.levelTransition == 0
 			&& current.uiState == 0 // State: inside a level
 			&& current.playing == 0
+		)
+		{
+			return true;
+		}
+		
+		// When entering a warp zone
+		if (
+			(
+				current.lvlType == 2 // Type: in a bandage warp zone
+				&& old.lvlType != 2
+			)
+			|| (
+				current.lvlType == 3 // Type: in a character warp zone
+				&& old.lvlType != 3
+			)
 		)
 		{
 			return true;
