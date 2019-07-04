@@ -3,6 +3,7 @@
 //   Thermospore: displays, DE splits
 //        zment4: display framework
 //      6DPSMETA: IW splits
+//         rJade: suggestions, bug reports
 // SMB community: feedback, bug reports
 // ------------------------------------
 
@@ -50,6 +51,8 @@ startup
 	}
 	
 	settings.Add("deathDisp", false, "Death count display");
+	settings.Add("deathDisp_Pause", true, "Pause death count when run ends", "deathDisp");
+	settings.SetToolTip("deathDisp_Pause", "Prevents post-run deaths from getting into your death count (ex: Escape deaths during credits).\nDeath counting resumes when the timer is reset");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
 	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
@@ -172,6 +175,11 @@ update
 	if (
 		settings["deathDisp"]
 		&& current.deathCount > old.deathCount
+		&& (
+			timer.CurrentPhase != TimerPhase.Ended // The run must not be finished
+			|| !settings["deathDisp_Pause"]        // Or the setting must be disabled
+		)
+		
 	)
 	{
 		vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
