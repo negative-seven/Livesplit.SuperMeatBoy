@@ -292,12 +292,15 @@ split
 			return true;
 		}
 		
-		// When using keyboard "S" to exit to map
+		// When finishing a level that boots you out to map
 		if (
 			current.levelTransition == 1
 			&& old.levelTransition == 0
 			&& current.uiState == 0 // State: inside a level
-			&& current.playing == 0
+			&& ( // Check if level has been beaten
+				current.ILTime != 100000000 // Changes to IL time when lvl beaten
+				|| old.playing == 0 // Used in case replay was entered
+			)
 		)
 		{
 			return true;
