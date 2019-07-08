@@ -292,7 +292,8 @@ split
 			return true;
 		}
 		
-		// When finishing a level that boots you out to map
+		// When finishing a light/dark level that boots you out to map
+		// ie: X-20 levels, dark levels where you don't have the next level unlocked, etc.
 		if (
 			current.levelTransition == 1
 			&& old.levelTransition == 0
@@ -306,14 +307,14 @@ split
 			return true;
 		}
 		
-		// When entering a warp zone from inside a level
+		// When entering a warp level from inside a light/dark level
 		if (
 			current.uiState == 0 // State: inside a level
 			&& (
 				old.lvlType == 0 // Type: light level
 				|| old.lvlType == 1 // Type: dark level
 			)
-			&& current.lvlType >= 2 // Types: warp zones
+			&& current.lvlType >= 2 // Types: warp levels
 			&& current.lvlType <= 5
 		)
 		{
@@ -327,7 +328,7 @@ split
 				current.lvlType == 0 // Type: light overworld
 				|| current.lvlType == 1 // Type: dark overworld
 			)
-			&& old.lvlType >= 2 // Types: warp zones, glitch level
+			&& old.lvlType >= 2 // Types: warp levels, glitch level
 			&& old.lvlType <= 6
 		)
 		{
