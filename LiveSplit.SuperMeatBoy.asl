@@ -319,6 +319,20 @@ split
 		{
 			return true;
 		}
+		
+		// When exiting to map from a warp or glitch level
+		// **still need to restrict to level completion, not just exit**
+		if (
+			(
+				current.lvlType == 0 // Type: light overworld
+				|| current.lvlType == 1 // Type: dark overworld
+			)
+			&& old.lvlType >= 2 // Types: warp zones, glitch level
+			&& old.lvlType <= 6
+		)
+		{
+			return true;
+		}
 	}
 	
 	// Boss entrance splits
