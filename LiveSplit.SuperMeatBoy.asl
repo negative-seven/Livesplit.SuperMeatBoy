@@ -310,15 +310,11 @@ split
 		if (
 			current.uiState == 0 // State: inside a level
 			&& (
-				(
-					current.lvlType == 2 // Type: in a bandage warp zone
-					&& old.lvlType != 2
-				)
-				|| (
-					current.lvlType == 3 // Type: in a character warp zone
-					&& old.lvlType != 3
-				)
+				old.lvlType == 0 // Type: light level
+				|| old.lvlType == 1 // Type: dark level
 			)
+			&& current.lvlType >= 2 // Types: warp zones
+			&& current.lvlType <= 5
 		)
 		{
 			return true;
