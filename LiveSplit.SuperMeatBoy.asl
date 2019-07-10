@@ -113,7 +113,7 @@ init
 		break;
 	}
 	
-	// Code to execute on startup
+	// Code to execute on timer start
 	vars.timer_OnStart = (EventHandler)((s, e) =>
 	{
 		// Set death count normalization on timer start
