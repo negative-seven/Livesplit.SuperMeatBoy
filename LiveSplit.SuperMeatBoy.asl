@@ -1,6 +1,6 @@
 // ---------------Credits--------------
-//            -7: creator
-//   Thermospore: displays, DE splits
+//            -7: creator, developer
+//   Thermospore: developer
 //        zment4: display framework
 //      6DPSMETA: IW splits
 //         rJade: suggestions, bug reports
