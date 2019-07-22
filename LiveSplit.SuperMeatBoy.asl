@@ -1,8 +1,9 @@
 // ---------------Credits--------------
-//            -7: creator
-//   Thermospore: displays, DE splits
+//            -7: creator, developer
+//   Thermospore: developer
 //        zment4: display framework
 //      6DPSMETA: IW splits
+//         rJade: suggestions, bug reports
 // SMB community: feedback, bug reports
 // ------------------------------------
 
@@ -22,6 +23,7 @@ state("SuperMeatBoy", "ogversion")
 	byte uiState         : "SuperMeatBoy.exe", 0x2d5ea0, 0x8d4;
 	byte levelTransition : "SuperMeatBoy.exe", 0x2d5ea8;
 	uint fetus           : "SuperMeatBoy.exe", 0x2d64bc, 0x10c;
+	int lvlType          : "SuperMeatBoy.exe", 0x2d54bc, 0x1ac;
 }
 
 state ("SuperMeatBoy", "1.2.5")
@@ -50,6 +52,8 @@ startup
 	}
 	
 	settings.Add("deathDisp", false, "Death count display");
+	settings.Add("deathDisp_Pause", true, "Pause death count when run ends", "deathDisp");
+	settings.SetToolTip("deathDisp_Pause", "Prevents post-run deaths from getting into your death count (ex: Escape deaths during credits).\nDeath counting resumes when the timer is reset");
 	
 	settings.Add("ilDisp", false, "Last IL Time display");
 	settings.SetToolTip("ilDisp", "Times are truncated to 3 places (The game shows times rounded to two)");
@@ -109,7 +113,7 @@ init
 		break;
 	}
 	
-	// Code to execute on startup
+	// Code to execute on timer start
 	vars.timer_OnStart = (EventHandler)((s, e) =>
 	{
 		// Set death count normalization on timer start
@@ -172,6 +176,11 @@ update
 	if (
 		settings["deathDisp"]
 		&& current.deathCount > old.deathCount
+		&& (
+			timer.CurrentPhase != TimerPhase.Ended // The run must not be finished
+			|| !settings["deathDisp_Pause"]        // Or the setting must be disabled
+		)
+		
 	)
 	{
 		vars.SetTextComponent("Deaths", (current.deathCount - vars.deathCountOffset).ToString());
@@ -283,12 +292,44 @@ split
 			return true;
 		}
 		
-		// When using keyboard "S" to exit to map
+		// When finishing a light/dark level that boots you out to map
+		// ie: X-20 levels, dark levels where you don't have the next level unlocked, etc.
 		if (
 			current.levelTransition == 1
 			&& old.levelTransition == 0
 			&& current.uiState == 0 // State: inside a level
-			&& current.playing == 0
+			&& ( // Check if level has been beaten
+				current.ILTime != 100000000 // Changes to IL time when lvl beaten
+				|| old.playing == 0 // Used in case replay was entered
+			)
+		)
+		{
+			return true;
+		}
+		
+		// When entering a warp level from inside a light/dark level
+		if (
+			current.uiState == 0 // State: inside a level
+			&& (
+				old.lvlType == 0 // Type: light level
+				|| old.lvlType == 1 // Type: dark level
+			)
+			&& current.lvlType >= 2 // Types: warp levels
+			&& current.lvlType <= 5
+		)
+		{
+			return true;
+		}
+		
+		// When exiting to map from a warp or glitch level
+		// **still need to restrict to level completion, not just exit**
+		if (
+			(
+				current.lvlType == 0 // Type: light overworld
+				|| current.lvlType == 1 // Type: dark overworld
+			)
+			&& old.lvlType >= 2 // Types: warp levels, glitch level
+			&& old.lvlType <= 6
 		)
 		{
 			return true;
