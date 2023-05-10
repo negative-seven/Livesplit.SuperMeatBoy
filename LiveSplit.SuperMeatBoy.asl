@@ -142,6 +142,12 @@ init
 	{
 		vars.SetTextComponent("Last IL Time", "[none]");
 	}
+
+	// In 1.2.5 watching a replay still counts as playing (playing=1), because of that exiting to the map after completing the level doesn't split
+	//
+	// This variable is set when ingame variable changes from 1e8 to an IL time
+	// and resets back to 1e8 when exiting the main game (playing=0), going to the next level (levelBeaten=1) or entering a cutscene (notCutscene=0)
+	vars.ILTime = 100000000;
 }
 
 shutdown // Autosplitter close
@@ -207,7 +213,22 @@ update
 			vars.SetTextComponent("Last IL Time", String.Format("{0:0.000}", current.ILTime));
 		}
 	}
+
+	// Update ILTime
+	if (old.ILTime == 100000000 && current.ILTime != 100000000)
+	{
+		vars.ILTime = current.ILTime;
+	}
 	
+	if (
+		(old.levelBeaten == 0 && current.levelBeaten == 1) || // Transitioned to the next level
+		current.playing == 0 ||								  // Not playing
+		current.notCutscene == 0							  // In cutscene
+	)
+	{
+		vars.ILTime = 100000000;
+	}
+
 	return true;
 }
 
@@ -304,8 +325,8 @@ split
 			&& old.levelTransition == 0
 			&& current.uiState == 0 // State: inside a level
 			&& ( // Check if level has been beaten
-				current.ILTime != 100000000 // Changes to IL time when lvl beaten
-				|| old.playing == 0 // Used in case replay was entered
+				vars.ILTime != 100000000 // Changes to IL time when lvl beaten
+				|| old.playing == 0 	 // Used in case replay was entered
 			)
 		)
 		{
