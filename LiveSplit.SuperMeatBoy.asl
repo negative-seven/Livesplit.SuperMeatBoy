@@ -28,7 +28,21 @@ state("SuperMeatBoy", "ogversion")
 
 state ("SuperMeatBoy", "1.2.5")
 {
-	// Currently unsupported
+	byte playing         : "SuperMeatBoy.exe", 0x30a1c8;
+	float ILTime         : "SuperMeatBoy.exe", 0x2f6abc;
+	byte world           : "SuperMeatBoy.exe", 0x2f79ac;
+	byte notCutscene     : "SuperMeatBoy.exe", 0x30999c, 0x3a8;
+	byte inSpecialLevel  : "SuperMeatBoy.exe", 0x30999c, 0x3a4;
+	byte levelBeaten     : "SuperMeatBoy.exe", 0x30a1e0;
+	byte exit            : "SuperMeatBoy.exe", 0x30a1a0, 0x14;
+	byte fetusType       : "SuperMeatBoy.exe", 0x30a1a0, 0x352;
+	int deathCount       : "SuperMeatBoy.exe", 0x30a380, 0x38ac;
+	int characters       : "SuperMeatBoy.exe", 0x30a380, 0x3950;
+	byte level           : "SuperMeatBoy.exe", 0x30ac90, 0x8dc;
+	byte uiState         : "SuperMeatBoy.exe", 0x30ac90, 0x8e0;
+	byte levelTransition : "SuperMeatBoy.exe", 0x30ad00;
+	uint fetus           : "SuperMeatBoy.exe", 0x30b3e4, 0x10c;
+	int lvlType          : "SuperMeatBoy.exe", 0x30a1a0, 0x3c68;
 }
 
 startup
@@ -91,15 +105,6 @@ init
 		break;
 	case 0x33c000:
 		version = "1.2.5";
-		MessageBox.Show(
-			timer.Form,
-			"This autosplitter does not support game version 1.2.5.\n" +
-			"To switch to the supported \"ogversion\" on Steam, right click on Super Meat Boy in your library, select Properties, go to the Betas tab and choose \"ogversion\".\n" +
-			"It is not possible to revert to this version on other platforms.",
-			"Autosplitter: Unsupported game version",
-			MessageBoxButtons.OK,
-			MessageBoxIcon.Information
-		);
 		break;
 	default:
 		version = "unknown";
@@ -164,7 +169,7 @@ exit // Game close
 update
 {
 	// Disable script on invalid/unsupported game version
-	if (version != "ogversion")
+	if (version == "unknown")
 	{
 		return false;
 	}
