@@ -348,14 +348,14 @@ split
 		}
 		
 		// When exiting to map from a warp or glitch level
-		// **still need to restrict to level completion, not just exit**
 		if (
 			(
 				current.lvlType == 0 // Type: light overworld
 				|| current.lvlType == 1 // Type: dark overworld
 			)
-			&& old.lvlType >= 2 // Types: warp levels, glitch level
-			&& old.lvlType <= 6
+			&& ((old.lvlType >= 2 && old.level <= 5 && old.level == 2) // Warp zone
+				|| (old.lvlType == 6 && old.level == 0))			   // Glitch level
+			&& current.ILTime != 100000000 // ILTime is not 1e8 after finishing warp zone or glitch level
 		)
 		{
 			return true;
