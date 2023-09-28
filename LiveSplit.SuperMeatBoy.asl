@@ -1,8 +1,9 @@
 // ---------------Credits--------------
-//            -7: creator, developer
+//            -7: developer
 //   Thermospore: developer
 //        zment4: display framework
 //      6DPSMETA: IW splits
+//    ACherryJam: 1.2.5 support
 //         rJade: suggestions, bug reports
 // SMB community: feedback, bug reports
 // ------------------------------------
